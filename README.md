@@ -45,10 +45,10 @@ Covers anthropometric, demographic, and force data analysis.
 > - *+general/force_plots_utils.R*
 
 ## Analysis Output
-Download the repository to view these HTML files:
-- Coherence: `+coherence/+plotting/final_coherence_plots.html`
-- General: `+general/general_analysis.html`
-- Motor Unit: `+mu/+statistical_analysis/mu_statistical_analysis.html`
+Click the links below or download the repository to view these HTML files:
+- Coherence: [+coherence/+plotting/final_coherence_plots.html](https://htmlpreview.github.io/?https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/%2Bcoherence/%2Bplotting/final_coherence_plots.html)
+- Motor Unit: [+mu/+statistical_analysis/mu_statistical_analysis.html](https://htmlpreview.github.io/?https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/%2Bmu/%2Bstatistical_analysis/mu_statistical_analysis.html)
+- General: [+general/general_analysis.html](https://htmlpreview.github.io/?https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/%2Bgeneral/general_analysis.html)
 
 ## Data Availability
 For data files to rerun this analysis, please contact: dcarter@uow.edu.au
