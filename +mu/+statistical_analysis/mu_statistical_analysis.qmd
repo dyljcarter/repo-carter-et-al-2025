@@ -1,0 +1,494 @@
+---
+title: "Statistical Analysis of Decomposed Motor Unit Metrics with Plotting"
+author: "Dylan Carter"
+format: html
+editor: visual
+toc: true
+toc-location: left
+toc-title: Contents
+theme:
+  light: cosmo
+  dark: darkly
+---
+
+## Initialise and Input Data.
+
+Install dependencies if needed.
+
+```{r results='hide', message=FALSE, warning=FALSE}
+# install.packages("tidyverse")
+# install.packages("ggbeeswarm")
+# install.packages("lme4")
+# install.packages("lmerTest")
+# install.packages("merTools")
+# install.packages("emmeans")
+# install.packages("performance")
+# install.packages("qqplotr")
+# install.packages("kableExtra")
+# install.packages("patchwork")
+# install.packages("ggtext")
+# install.packages("ggplotify")
+# install.packages("svglite")
+```
+
+Load required packages and set seed:
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggbeeswarm)
+library(lme4)
+library(lmerTest)
+library(merTools)
+library(emmeans)
+library(performance)
+library(qqplotr)
+library(kableExtra)
+library(patchwork)
+library(ggtext)
+library(ggplotify)
+library(svglite)
+```
+
+Specify source of required helper functions:
+
+```{r results='hide', message=FALSE, warning=FALSE}
+source("mu_plots_utils.R")
+```
+
+Load the data file for analysis:
+
+-   This is the *analysed_mu_data.csv* file, which has been output from the process_mu_data.m function.
+
+```{r}
+mu_data <- read_csv("analysed_mu_data.csv", 
+    col_types = cols(testing_group = col_factor(levels = c("dexterity", 
+        "strength")), force_level = col_factor(levels = c("15", 
+        "35", "55", "70")), trial = col_factor(levels = c("1", 
+        "2", "3")), muscle = col_factor(levels = c("apb", 
+        "fds"))))
+glimpse(mu_data,1)
+```
+
+## Number of motor units identified at each force level
+
+### Table
+
+-   A cross-tabulation of the number of motor units identified at each muscle and force level within each group.
+
+```{r}
+no_of_mus <- as.data.frame(table(mu_data$testing_group,
+                                 mu_data$force_level, 
+                                 mu_data$muscle)
+                           )
+ 	
+no_of_mus <- no_of_mus %>% rename("Testing Group" = Var1,
+                                "Force Level" = Var2,
+                                Muscle = Var3,
+                                "MU Count" = "Freq") %>%
+  dplyr::select(Muscle, "Force Level", "Testing Group", "MU Count")
+
+kable(no_of_mus) %>% 
+  kable_styling(c("striped", "hover", "condensed")) %>%
+  collapse_rows(columns = c(1,2), valign = "middle")
+```
+
+### Plot: number of motor units and firing threshold
+
+-   A beeswarm plot of motor unit recruitment threshold of identified motor units at at each muscle and force level within each group.
+
+-   The number of motor units identified for each muscle and force level is displayed directly below the data.
+
+-   NOTE:
+
+    -   Custom font was used for published graphs, but removed here for reproducibility.
+
+    -   Some styling and organisation of plots were done in InkScape after their creation. All data elements were kept identical to their output, only aesthetic changes were made.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show function for plotting"
+
+# FUNCTION: create_mu_beeswarm
+
+# Creates split beeswarm plots for motor unit thresholds at each force level and for each muscle.
+
+# Inputs:
+# - data: output table from the matlab function "process_mu_data.m" - "analysed_mu_data.csv".
+
+# Outputs:
+# - Split beeswarm plot for motor unit thresholds faceted by force level and muscle.
+
+create_mu_beeswarm <- function(data) {
+  
+  # Transform input data:
+  # - Convert muscle labels to uppercase
+  # - Rename testing groups to more readable format
+  data <- data %>%
+    mutate(
+      muscle = toupper(muscle),  # Convert APB/FDS to uppercase
+      testing_group = case_when(  # Rename groups for better readability
+        testing_group == "strength" ~ "Strength-Trained",
+        testing_group == "dexterity" ~ "Dexterity-Trained",
+        TRUE ~ testing_group
+      )
+    )
+  
+  # Calculate sample size for each combination of:
+  # - force level (15%, 35%, 55% and 70%)
+  # - muscle (APB, FDS)
+  # - testing group (Strength, Dexterity)
+  # This will be displayed below each group in the plot
+  count_data <- data %>%
+    group_by(force_level, muscle, testing_group) %>%
+    summarise(count = n(), .groups = 'drop') %>%
+    mutate(y_pos = -3)  # Position for count labels below the data points
+  
+  # Create the base beeswarm plot
+  plot <- ggplot(data) + 
+    # Add jittered points (beeswarm style) for each data point
+    geom_quasirandom(
+      aes(
+        x = muscle,  # X-axis shows muscle type (APB/FDS)
+        y = firing_threshold,  # Y-axis shows motor unit recruitment threshold
+        group = testing_group,  # Separate points by training group
+        colour = testing_group,  # Color points by training group
+        shape = testing_group,  # Different shapes for each group
+        fill = testing_group  # Fill color for shapes
+      ),
+      width = 0.3,  # Controls horizontal spread of points
+      size = 1    # Size of individual points
+    ) +
+    # Add sample size labels below each group
+    geom_text(
+      data = count_data,
+      aes(x = muscle, y = y_pos, 
+          label = count,
+          color = testing_group,
+          group = testing_group),
+      show.legend = FALSE,
+      position = position_dodge(width = 0.6),
+      size = 8/.pt,
+      vjust = 1
+    ) +
+    geom_hline(yintercept = 0, linewidth = 0.2, colour = "grey80") +
+    # Create separate panels for each force level
+    facet_wrap(vars(force_level), nrow = 1, 
+               labeller = labeller(force_level = function(x) paste0(x, "% MVC"))) +
+    # Add axis labels and legend titles
+    labs(x = "Muscle", y = "Recruitment Threshold\n(% of MVC)", color = "Testing Group", 
+         shape = "Testing Group", fill = "Testing Group") +
+    # Use black and white theme as base
+      # Apply theme and styling which will be consistent across plots
+    theme_bw() +
+    theme(
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_rect(colour = "grey70"),
+      legend.position = "none",
+      strip.text = element_text(size = 11, face = "bold"),
+      axis.title = element_text(size = 11, face = "bold"),
+      axis.text.x = element_text(size = 9, face = "bold"),
+      axis.line.x = element_line(size = 0.3, colour = "grey80"),
+      axis.text.y = element_text(size = 9),
+      title = element_blank(),
+      strip.background = element_rect(fill = "grey90", color = NA) 
+    ) +
+    # Set custom shapes, colors and fills for groups
+    scale_shape_manual(values = c("Strength-Trained" = 21, "Dexterity-Trained" = 24)) +
+    scale_color_manual(values = c("Strength-Trained" = "#fe9d5d", "Dexterity-Trained" = "#456990")) +
+    scale_fill_manual(values = c("Strength-Trained" = "#fe9d5d", "Dexterity-Trained" = "#456990")) +
+    
+    # Configure y-axis scale
+    scale_y_continuous(
+      breaks = c(0, 25, 50, 75), # Scale for each force level
+      labels = c("0%", "25%", "50%", "75%"),
+      limits = c(-5, 75)  # Include space for count labels at bottom
+    )
+  
+  # Modify point positions to create split beeswarm effect
+  # This separates strength and dexterity groups horizontally
+  p <- ggplot_build(plot)
+  p$data[[1]] <- p$data[[1]] %>%
+    mutate(
+      diff = abs(x-round(x)+0.1),  # Calculate offset from center
+      x = case_when(  # Apply offset in opposite directions for each group
+        group %% 2 == 0 ~ round(x) + diff,
+        TRUE ~ round(x) - diff
+      )
+    ) %>%
+    dplyr::select(-diff)
+  
+  # Convert back to gtable and return
+  ggplot_gtable(p)
+}
+```
+
+```{r,  warning=FALSE, fig.width=6.8, fig.height=3}
+no_of_identified_mu_plot <- as.ggplot(create_mu_beeswarm(mu_data))
+
+# Add y-axis label
+no_of_identified_mu_plot <- no_of_identified_mu_plot +
+  labs(y = "Recruitment Threshold (% of MVC)")
+
+no_of_identified_mu_plot
+```
+
+## Linear Mixed Effects Modelling
+
+### Model 1: participant random effect
+
+This is a linear mixed effects model of average firing rate.
+
+-   The fixed effects, which are all interaction terms include:
+
+    -   Testing group.
+
+    -   Force level.
+
+    -   Muscle being tested.
+
+-   The random effects is:
+
+    -   Participant.
+
+```{r}
+model_participant_only <- lmer(avg_firing_rate 
+                               ~ testing_group 
+                               * force_level 
+                               * muscle
+                               + (1|participant),
+                               data=mu_data
+                               )
+
+summary(model_participant_only)
+```
+
+### Model 2: participant and firing threshold random effect
+
+This is a linear mixed effects model of average firing rate.
+
+-   The fixed effects, which are all interaction terms include:
+
+    -   Testing group.
+
+    -   Force level.
+
+    -   Muscle being tested.
+
+-   The random effects is:
+
+    -   Participant.
+
+    -   Firing (or recruitment) threshold.
+
+```{r}
+model_participant_firing_threhsold <- lmer(avg_firing_rate 
+                                           ~ testing_group 
+                                           * force_level 
+                                           * muscle
+                                           +(1|participant) 
+                                           + (1|firing_threshold),
+                                           data=mu_data
+                                           )
+
+summary(model_participant_firing_threhsold)
+```
+
+### Comparison of model performance
+
+This is a comparison of model performance, containing several variables.
+
+Due to lower AICc, and higher conditional $R^2$ and marginal $R^2$ values, the model which includes both participant and firing threshold as random effects was chosen.
+
+It also makes sense physiologically, with motor unit firing threshold and firing rate being related.
+
+```{r warning=FALSE, message=FALSE}
+model_comparisons <- t(as.data.frame(compare_performance(
+  model_participant_only, 
+  model_participant_firing_threhsold)))
+
+colnames(model_comparisons) <- model_comparisons[1,]
+
+kable(model_comparisons[-1,]) %>% 
+  kable_styling(c("striped", "hover", "condensed"))
+
+```
+
+### Checking model assumptions
+
+Moving on with model 2 (including participant and firing threshold as random effects), here we are checking that the model assumptions are met.
+
+-   Note:
+
+    -   High levels of multicollinearity were observed among some of the fixed effects variables. This was mainly observed in the control variables and not in the dependent variable.
+
+    -   This multicollinearity was unavoidable due to the nature of our hypotheses, and thus, the model was still employed to address our research questions.
+
+```{r, fig.width=14, fig.height=8, message=FALSE, error= FALSE}
+plot(check_collinearity(model_participant_firing_threhsold))
+plot(check_heteroscedasticity(model_participant_firing_threhsold))
+plot(check_normality(model_participant_firing_threhsold))
+plot(check_predictions(model_participant_firing_threhsold))
+```
+
+## Average firing rate calculations using estimated marginal means
+
+### Calculate estimated marginal means
+
+Here we calculate the average firing rate estimated marginal means and 95% confidence intervals. These were calculated for each testing group and muscle, conditioned on force level.
+
+```{r}
+emm <- emmeans(model_participant_firing_threhsold, 
+               pairwise 
+               ~ testing_group 
+               | force_level 
+               + muscle, 
+               adjust = 'BH', 
+               infer = T)
+
+emm
+```
+
+### Plotting the estimated marginal means
+
+Here the average firing rate is plotted, which each muscle in its own facet.
+
+-   NOTE:
+
+    -   15% MVC in the FDS muscle was not included in the analysis due to the low number of identified motor units.
+
+    -   Custom font was used for published graphs, but removed here for reproducibility.
+
+    -   Some styling and organisation of plots were done in InkScape after their creation. All data elements were kept identical to their output, only aesthetic changes were made.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show function for plotting"
+
+
+# FUNCTION: create_emmeans_plot
+
+# Creates geom_point plot for the estimated marginal mean motor unit firing rate 
+# at each force level and for each muscle.
+
+# Inputs:
+# - data: output from the EMmeans function used for calculation of estimated marginal means            in linear
+#         mixed effects models
+
+# Outputs:
+# - Plot of EMM average motor unit firing rate faceted by muscle.
+
+
+create_emmeans_plot <- function(emm) {
+  
+  # Process estimated marginal means data:
+  # - Rename columns for clarity 
+  # - Convert force levels to numeric
+  # - Format group names
+  # - Filter to include only specific force levels for each muscle
+  processed_emm_data <- as.data.frame(emm$emmeans) %>%
+    rename(Mean = emmean, 
+           Lower_CI = lower.CL, 
+           Upper_CI = upper.CL) %>%
+    mutate(
+      force_level = as.numeric(gsub("MVC", "", as.character(force_level))),
+      muscle = case_when(
+        muscle == "apb" ~ "Abductor Pollicis Brevis",
+        muscle == "fds" ~ "Flexor Digitorum Superficialis",
+        TRUE ~ muscle
+      ),
+      testing_group = case_when(
+        testing_group == "strength" ~ "Strength-Trained",
+        testing_group == "dexterity" ~ "Dexterity-Trained",
+        TRUE ~ testing_group
+      )
+    ) %>% 
+    # Filter data to include:
+    # - APB muscle: 15%, 35%, 55%, 70% force levels
+    # - FDS muscle: 35%, 55%, 70% force levels
+    filter((muscle == "Abductor Pollicis Brevis" & force_level %in% c(15, 35, 55, 70)) |
+             (muscle == "Flexor Digitorum Superficialis" & force_level %in% c(35, 55, 70)))
+  
+  # Create plot showing estimated means and confidence intervals
+  ggplot(processed_emm_data, aes(x = force_level, color = testing_group)) +
+    # Add fine lines connecting means within each group
+    geom_line(aes(y = Mean, group = testing_group, linetype = testing_group), 
+              linewidth = 0.2, position = position_dodge(width = 2)) +
+    # Add points with error bars showing confidence intervals
+    geom_pointrange(aes(y = Mean, ymin = Lower_CI, ymax = Upper_CI, 
+                        shape = testing_group, fill = testing_group), 
+                    linewidth = 1.5, size = 0.7, position = position_dodge(width = 2)) +
+    # Add labels and titles
+    labs(
+      x = "Percentage of MVC",
+      y = "Estimated Marginal Mean\nFiring Rate",
+      color = "Testing Group",
+      shape = "Testing Group",
+      fill = "Testing Group",
+      linetype = "Testing Group"
+    ) +
+    # Apply black and white theme and customize appearance
+    theme_bw() +
+    theme(
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_rect(colour = "grey70"),
+      legend.position = "bottom",
+      strip.text = element_text(size = 12, face = "bold"),
+      axis.title.x = element_text(size = 11, face = "bold", margin = margin(t = 15)),
+      axis.text.x = element_text(size = 9, face = "bold"),
+      axis.line.x = element_line(size = 0.3, colour = "grey80"),
+      axis.title.y.left = element_text(size = 11, face = "bold", margin = margin(r = 10)),
+      axis.text.y = element_text(size = 9),
+      title = element_blank(),
+      strip.background = element_rect(fill = "grey90", color = NA) ,
+      legend.title = element_text(size = 9, face = "bold"),
+      legend.text = element_text(size = 9)
+    ) +
+    # Configure x-axis scale and labels
+    scale_x_continuous(
+      limits = c(10, 75),
+      labels = scales::percent_format(scale = 1),
+      breaks = c(15, 35, 55, 70)
+    ) +
+    # Set custom shapes, colors, fills and line types for groups
+    scale_shape_manual(values = c("Strength-Trained" = 21, "Dexterity-Trained" = 24)) +
+    scale_color_manual(values = c("Strength-Trained" = "#fe9d5d", "Dexterity-Trained" = "#456990")) +
+    scale_fill_manual(values = c("Strength-Trained" = "#fe9d5d", "Dexterity-Trained" = "#456990")) +
+    scale_linetype_manual(values = c("Strength-Trained" = 5, "Dexterity-Trained" = 1)) +
+    # Create separate panels for each muscle
+    facet_wrap(~ muscle)
+}
+```
+
+```{r, fig.width=6.8, fig.height=3.6}
+mu_avg_firing_rate_plot <- create_emmeans_plot(emm)
+
+mu_avg_firing_rate_plot
+```
+
+### Combining the plots into the final figure
+
+Using patchwork to combine figures
+
+```{r warning=FALSE,fig.width=6.8, fig.height=6.6}
+final_plot <- 
+  (no_of_identified_mu_plot + labs(tag = "A")) /
+  (free(mu_avg_firing_rate_plot) + labs(tag = "B")) +
+  plot_layout(
+    guides = 'collect', # Collect all legends
+    ) & 
+    theme(legend.position = "bottom") +
+    plot_annotation(tag_levels = "A") + # Add tags
+    theme(plot.tag = element_text(size = 18, face = "bold"))
+
+final_plot
+```
+
+```{r echo=FALSE}
+
+## Save as .svg if needed.
+# 
+# ggsave("mu_fr_plot.svg", mu_avg_firing_rate_plot, device = svglite, width = 6.8, height = 3.6)
+# ggsave("mu_threshold_plot.svg", no_of_identified_mu_plot, device = svglite, width = 6.8, height = 3)
+```
