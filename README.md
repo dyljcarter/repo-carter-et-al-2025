@@ -1,9 +1,12 @@
 # REPO-CARTER-ET-AL-2025
 ## Overview
-This repository contains all code used to analyse data for the manuscript:
-"Neuromuscular control of a five-finger pinch task is influenced by training history."  
-by Dylan J. Carter, James R. Forsyth, Joshua P.M. Mattock and Jonathan Shemmell (2025)
-Published in Experimental Brain Research.
+This repository contains all code used to analyse data for the article:
+
+**Neuromuscular control of a five-finger pinch task is influenced by training history.** 
+
+by Dylan J. Carter, James R. Forsyth, Joshua P.M. Mattock and Jonathan Shemmell. Published in Experimental Brain Research (2025).
+
+___
 
 ## Statistical analysis (R)
 `statistical_analysis.qmd`
@@ -54,4 +57,4 @@ For data files to rerun this analysis, please contact: dcarter@uow.edu.au
    University of Wollongong
 ## Acknowledgments
 - Analysis uses the NeuroSpec 2.0 toolbox by Dr David Halliday et al. ([GitHub](https://github.com/dmhalliday/NeuroSpec))
-- Thank you to Dr David Halliday and Dr Tjeerd Boonstra for their assistance with intermuscular coherence analysis implementation
+- Thank you to Dr David Halliday and Dr Tjeerd Boonstra for their assistance with intermuscular coherence analysis implementation.
