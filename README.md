@@ -8,12 +8,12 @@ by Dylan J. Carter, James R. Forsyth, Joshua P.M. Mattock and Jonathan Shemmell.
 
 ___
 
-## Statistical analysis (R)
+## Statistical analysis code (R)
 `statistical_analysis.qmd`
 
 ### Output from statistical analysis
 Click the links below or download the repository to view these HTML files:
-- Coherence: [statistical_analysis.html](https://html-preview.github.io/?url=https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/statistical_analysis.html)
+- Statistical analysis html doc: [statistical_analysis.html](https://html-preview.github.io/?url=https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/statistical_analysis.html)
 
 
 ## Data analysis (MATLAB)
