@@ -1,0 +1,74 @@
+## ============= REPO-CARTER-ET-AL-2025 GITGNORE FILE ============= ##
+
+#----------------------#
+# DATA FILES & TOOLBOX
+#----------------------#
+
+# folders
++coherence/+emg_force_data
++mu/+decomposition_data
+
+# .csv files
+*.csv
+
+# Ignore neurospec20 toolbox folder
++coherence/neurospec20
+
+
+#----------------------#
+# MAC SYSTEM FILES
+#----------------------#
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+
+#----------------------#
+# MATLAB FILES
+#----------------------#
+
+*.asv       # Auto-save files
+*.m~        # Auto-save backup files (MATLAB on Mac/Linux)
+slprj/      # Simulink cache folder
+*.slxc      # Simulink cache files
+codegen/    # Generated C/C++ code directory
+*.mex*      # MEX-files
+*.mlappinstall  # App installer files
+*.mlpkginstall  # Support package installer files
+helpsearch*/    # Cached help files
+*.mat
+
+
+#----------------------#
+# R FILES
+#----------------------#
+
+# History and session files
+.Rhistory
+.Rapp.history
+.RData
+.RDataTmp
+.Ruserdata
+.Renviron
+# RStudio files
+.Rproj.user/
+rsconnect/
+# Package development files
+*-Ex.R
+/*.tar.gz
+/*.Rcheck/
+# Documentation and vignettes
+vignettes/*.html
+vignettes/*.pdf
+docs/
+# Cache and temporary files
+*_cache/
+/cache/
+*.utf8.md
+*.knit.md
+po/*~
+# Authentication
+.httr-oauth
