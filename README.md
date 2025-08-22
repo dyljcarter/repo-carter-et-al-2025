@@ -16,7 +16,7 @@ Click the links below or download the repository to view these HTML files:
 - Statistical analysis html doc: [statistical_analysis.html](https://html-preview.github.io/?url=https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/statistical_analysis.html)
 
 
-## Data analysis (MATLAB)
+## Data analysis code (MATLAB)
 
 ### 1. Intermuscular coherence analysis
 `+coherence/calculate_coherence.m`
