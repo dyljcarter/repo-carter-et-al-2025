@@ -1862,12 +1862,12 @@ average_band_coherence <- function(pooled_coherence_data) {
   
   # Define row ranges for each frequency band
   alpha_rows <- 4:7
-  beta_rows <- 8:28
+  beta_rows <- 8:13
   gamma_rows <- 14:28
   
   # Calculate averages for each column and frequency band
   for (col in coh_cols) {
-    # Make sure we're accessing the data correctly and converting to numeric
+
     col_data <- as.numeric(as.character(pooled_coherence_data[[col]]))
     
     # Calculate average for alpha band (rows 4-7)

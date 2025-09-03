@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this analysis code, please cite our paper as below."
+authors:
+- family-names: "Carter"
+  given-names: "Dylan J."
+  orcid: "https://orcid.org/0009-0004-0273-3272"
+- family-names: "Forsyth"
+  given-names: "James R."
+  orcid: "https://orcid.org/0000-0003-1980-2401"
+- family-names: "Mattock"
+  given-names: "Joshua P. M."
+  orcid: "https://orcid.org/0000-0002-9550-7298"
+- family-names: "Shemmell"
+  given-names: "Jonathan"
+  orcid: "https://orcid.org/0000-0002-4575-133X"
+title: "Neuromuscular control of a five-finger pinch task is influenced by training history"
+date-released: 2025-09-22
+url: "https://github.com/dyljcarter/repo-carter-et-al-2025"
+preferred-citation:
+  type: article
+  authors:
+- family-names: "Carter"
+  given-names: "Dylan J."
+  orcid: "https://orcid.org/0009-0004-0273-3272"
+- family-names: "Forsyth"
+  given-names: "James R."
+  orcid: "https://orcid.org/0000-0003-1980-2401"
+- family-names: "Mattock"
+  given-names: "Joshua P. M."
+  orcid: "https://orcid.org/0000-0002-9550-7298"
+- family-names: "Shemmell"
+  given-names: "Jonathan"
+  orcid: "https://orcid.org/0000-0002-4575-133X"
+  doi: "10.1007/s00221-025-07147-z"
+  journal: "Experimental Brain Research"
+  month: 9
+  start: 205 # First page number
+  title: "Neuromuscular control of a five-finger pinch task is influenced by training history"
+  issue: 10
+  volume: 243
+  year: 2025
