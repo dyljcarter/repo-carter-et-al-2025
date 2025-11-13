@@ -12,7 +12,7 @@ ___
 `statistical_analysis.qmd`
 
 ### Output from statistical analysis
-Click the links below or download the repository to view these HTML files:
+Click the link below (or download the repository to view these HTML files):
 - Statistical analysis html doc: [statistical_analysis.html](https://htmlpreview.github.io/?https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/statistical_analysis.html)
 
 
