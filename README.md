@@ -13,7 +13,7 @@ ___
 
 ### Output from statistical analysis
 Click the link below (or download the repository to view these HTML files):
-- Statistical analysis html doc: [statistical_analysis.html](https://htmlpreview.github.io/?https://github.com/dyljcarter/repo-carter-et-al-2025/blob/main/statistical_analysis.html)
+- Statistical analysis webpage (.html): [statistical_analysis.html](https://dyljcarter.github.io/repo-carter-et-al-2025/statistical_analysis.html)
 
 
 ## Data analysis code (MATLAB)
